@@ -84,6 +84,28 @@ tbody tr td {
   /* width: 100%; */
 }
 
+.modal {
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.modal_content {
+  min-width: 50vw;
+  max-width: 75vw;
+  padding: 24px 48px;
+  background-color: white;
+}
+
 .td_date {
   font-weight: bold;
 }

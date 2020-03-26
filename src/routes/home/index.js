@@ -20,6 +20,8 @@ import { testDb } from "../../api/";
 const Home = () => {
   const [emails, setEmails] = useState([]);
   const [sort, setSort] = useState(new Map());
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedMail, setSelectedMail] = useState({});
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
 
   useEffect(() => {
@@ -88,6 +90,35 @@ const Home = () => {
     );
   }
 
+  function handleModal() {
+    setOpenModal(!openModal);
+  }
+
+  /**
+   * FIXME: Must be a workaround to this
+   */
+  function handleRowClick(e) {
+    const { tagName } = e.target;
+    let el;
+    let obj = {};
+
+    if (tagName === "TD") {
+      el = e.target.parentElement;
+    } else {
+      el = e.target;
+    }
+
+    for (const element of el.children) {
+      const name = (element.attributes["name"] || {}).value;
+      const value = element.innerText;
+      if (name) {
+        obj = Object.assign({}, obj, { [name]: value });
+      }
+    }
+    setSelectedMail(obj);
+    setOpenModal(true);
+  }
+
   return (
     <div class={style.home}>
       <div class={style.searchContainer}>
@@ -102,15 +133,52 @@ const Home = () => {
       </p>
       <hr />
       {(emails.length > 0 && (
-        <Table emails={emails} handleSort={handleSort} sort={sort} />
+        <Table
+          emails={emails}
+          handleSort={handleSort}
+          sort={sort}
+          handleRowClick={handleRowClick}
+        />
       )) || (
         <div class={style.logoContainer}>
           <img src={Logo} alt="Logo" />
         </div>
       )}
+      <Modal data={selectedMail} isOpen={openModal} handleClick={handleModal} />
     </div>
   );
 };
+
+const Modal = props => (
+  <div
+    class={style.modal}
+    style={{ display: props.isOpen ? "flex" : "none" }}
+    onClick={props.handleClick}
+  >
+    <div class={style.modal_content}>
+      <header>
+        <h1
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis"
+          }}
+        >
+          {props.data.subject}
+        </h1>
+        <div style={{ display: "flex", justifyContent: "stretch" }}>
+          <h2 style={{ flex: 1 }}>From: {props.data.from}</h2>
+          <p style={{ flex: 1, alignSelf: "center", textAlign: "right" }}>
+            Date: {props.data.date}
+          </p>
+        </div>
+      </header>
+      <main>
+        <p>Here goes the content...</p>
+      </main>
+    </div>
+  </div>
+);
 
 const Table = props => {
   return (
@@ -151,7 +219,7 @@ const Table = props => {
       </thead>
       <tbody>
         {props.emails.map((email, k) => (
-          <Row data={email} key={k} onClick={props.handleRowClick} />
+          <Row data={email} key={k} handleClick={props.handleRowClick} />
         ))}
       </tbody>
     </table>
@@ -213,7 +281,11 @@ const Row = props => {
     } else {
       value = props.data[key];
     }
-    return <td class={style[`td_${key}`]}>{value}</td>;
+    return (
+      <td name={key} class={style[`td_${key}`]}>
+        {value}
+      </td>
+    );
   });
 
   return (
