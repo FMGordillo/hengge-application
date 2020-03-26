@@ -7,21 +7,24 @@ db.defaults({
   emails: [
     {
       from: "aaa@example.com",
-      to: "zzz.zzz@example.com",
+      to: ["zzz.zzz@example.com"],
+      mailchain: 0,
       subject: "[ HR-888 ] Notice of official announcement",
       hasAttachments: true,
       date: new Date()
     },
     {
       from: "bbb.bbb@example.com",
-      to: "yyy@example.com",
+      to: ["yyy@example.com", "zzz@example.com"],
+      mailchain: 1,
       subject: '[web-333] "Web Contact"',
       hasAttachments: false,
       date: subDays(new Date(), 3)
     },
     {
       from: "bbb.bbb@example.com",
-      to: "yyy@example.com",
+      to: ["yyy@example.com"],
+      mailchain: 1,
       subject:
         'A really longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglong subject"',
       hasAttachments: false,
@@ -29,7 +32,8 @@ db.defaults({
     },
     {
       from: "bbb.bbb@example.com",
-      to: "yyy@example.com",
+      to: ["yyy@example.com"],
+      mailchain: 2,
       subject: "A past event",
       hasAttachments: false,
       date: subYears(new Date(), 2)

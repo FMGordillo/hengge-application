@@ -30,7 +30,9 @@ td {
 /* Variables */
 :root {
   font-size: 18px;
+  --color: #6d6d6d;
   --border: 1px solid #e1e1e1;
+  --mobile-padding: 0 1em;
 }
 
 table {
@@ -39,18 +41,20 @@ table {
 
 tr {
   display: grid;
-  grid-template-columns: 1fr 1fr 2fr 2em 1fr;
+  grid-template-columns: 1em 1fr 1fr 3em 3fr 2em 1fr 1em 1em;
   padding: 0.5em 0;
 }
 
 td {
   margin: 0 0.5em;
 }
-
 thead tr {
+  /* TODO: Improve this with font-weight */
+  font-size: 0.75em;
   border-top: var(--border);
   border-bottom: var(--border);
   background-color: #f5f5f5;
+  font-weight: bold;
 }
 
 thead tr td {
@@ -62,20 +66,32 @@ tbody tr {
   border-bottom: var(--border);
 }
 
+tbody tr:hover {
+  cursor: pointer;
+  color: #0033dd;
+  background-color: #f6f8fa;
+}
+
 tbody tr td {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-tbody tr td:last-child {
+.home {
+  padding: 24px 48px 0 48px;
+  min-height: 100%;
+  /* width: 100%; */
+}
+
+.td_date {
   font-weight: bold;
 }
 
-.home {
-  padding: 0 48px;
-  min-height: 100%;
-  /* width: 100%; */
+.results {
+  color: var(--color);
+  font-weight: 700;
+  margin-bottom: 0px;
 }
 
 .logoContainer {
@@ -89,12 +105,110 @@ tbody tr td:last-child {
 }
 
 .counterSpan {
-  font-size: 1.75rem;
+  font-size: 1.15rem;
+}
+
+.isSorted {
   font-weight: bolder;
 }
 
+/* Static image for Mobile */
+.td_image {
+  visibility: hidden;
+}
+.td_mailchain {
+  color: white;
+  font-weight: 500;
+  font-size: 0.85em;
+}
+.td_mailchain_content {
+  padding: 1px 6px;
+  border-radius: 8px;
+  background-color: #888888;
+}
+.td_arrow {
+  display: none;
+  color: red;
+}
+
 @media (max-width: 720px) {
-  table {
-    color: red;
+  :root {
+    font-size: 16px;
+  }
+  .home {
+    padding: 24px 0 0 0;
+  }
+  .results {
+    padding: var(--mobile-padding);
+  }
+  .searchContainer {
+    padding: var(--mobile-padding);
+  }
+
+  /* Grid areas for Mobile */
+  .td_image {
+    visibility: visible;
+    grid-area: image;
+  }
+  .td_to {
+    font-size: 0.85em;
+    grid-area: to;
+  }
+  .td_from {
+    font-weight: bold;
+    font-size: 0.85em;
+    grid-area: from;
+  }
+  .td_mailchain {
+    text-align: right;
+    grid-area: banner;
+  }
+  .td_date {
+    text-align: right;
+    font-weight: normal;
+    font-size: 0.75em;
+    grid-area: date;
+  }
+  .td_subject {
+    margin-left: 0;
+    grid-area: subject;
+  }
+  .td_hasAttachments {
+    margin: 0;
+    grid-area: attachment;
+  }
+  .td_arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    grid-area: arrow;
+  }
+
+  thead tr {
+    display: block;
+  }
+  thead td {
+    margin: 0;
+  }
+
+  thead tr td:not(:last-child):not(:nth-child(4))::after {
+    content: " | ";
+  }
+
+  thead tr {
+    padding: var(--mobile-padding);
+    grid-template-columns: 1fr;
+  }
+
+  tbody tr {
+    height: 5rem;
+    padding: 0.5em 1em;
+    grid-template-columns: 1em 1fr 1fr 1fr 1em 4em 1em;
+    grid-template-rows: auto;
+    grid-template-areas:
+      "image from from from attachment date arrow"
+      "image to to to to banner banner"
+      "subject subject subject subject subject subject subject";
   }
 }
