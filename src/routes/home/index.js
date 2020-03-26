@@ -1,6 +1,6 @@
 import { h } from "preact";
-import { format, isSameDay, isSameWeek } from "date-fns";
 import { useEffect, useState } from "preact/hooks";
+import { format, isSameDay, isSameWeek } from "date-fns";
 
 import Logo from "../../assets/logo.png";
 import Clip from "../../assets/icon_clip.svg";
@@ -12,25 +12,54 @@ import { testDb } from "../../api/";
 
 const Home = () => {
   const [emails, setEmails] = useState([]);
-  const [sort] = useState(new Map());
+  const [sort, setSort] = useState(new Map());
 
   useEffect(() => {
     setEmails(testDb());
-  }, [emails]);
+  }, []);
 
   function handleSort(e) {
     const el = e.srcElement.id;
     if (sort.get(el) === "asc") {
       sort.set(el, "desc");
-      return;
-    }
-
-    if (sort.get(el) === "desc") {
+    } else if (sort.get(el) === "desc") {
       sort.delete(el);
+    } else sort.set(el, "asc");
+    sortArray();
+  }
+
+  function sortArray() {
+    let newArr = emails;
+
+    // We must reset to its default, by date
+    if (sort.size <= 0) {
+      newArr = newArr.sort(
+        (a, b) => (b.date === a.date && 0) || (b.date < a.date && -1) || 1
+      );
+      setEmails([...newArr]);
       return;
     }
 
-    sort.set(el, "asc");
+    // For each key (in the order or the columns) sort it out
+    for (const [key, value] of sort.entries()) {
+      const currKey = key.split("-")[0];
+      if (value === "desc") {
+        newArr = newArr.sort(
+          (a, b) =>
+            (b[currKey] === a[currKey] && 0) ||
+            (b[currKey] < a[currKey] && -1) ||
+            1
+        );
+      } else {
+        newArr = newArr.sort(
+          (a, b) =>
+            (b[currKey] === a[currKey] && 0) ||
+            (b[currKey] > a[currKey] && -1) ||
+            1
+        );
+      }
+    }
+    setEmails([...newArr]);
   }
 
   return (
@@ -47,44 +76,7 @@ const Home = () => {
       </p>
       <hr />
       {(emails.length > 0 && (
-        <table>
-          <caption style={{ display: "none" }}>Email list</caption>
-          <thead>
-            <tr>
-              <TdHead
-                id="from-sort"
-                onClick={handleSort}
-                text="From"
-                sorted={sort}
-              />
-              <TdHead
-                id="to-sort"
-                onClick={handleSort}
-                text="To"
-                sorted={sort}
-              />
-              <TdHead
-                id="subject-sort"
-                onClick={handleSort}
-                text="Subject"
-                sorted={sort}
-              />
-              <TdHead id="attachments-sort" sorted={sort} />
-              {/* Attachments */}
-              <TdHead
-                id="date-sort"
-                onClick={handleSort}
-                text="Date"
-                sorted={sort}
-              />
-            </tr>
-          </thead>
-          <tbody>
-            {emails.map((email, k) => (
-              <Row data={email} key={k} />
-            ))}
-          </tbody>
-        </table>
+        <Table emails={emails} handleSort={handleSort} sort={sort} />
       )) || (
         <div class={style.logoContainer}>
           <img src={Logo} alt="Logo" />
@@ -93,6 +85,47 @@ const Home = () => {
     </div>
   );
 };
+
+const Table = props => (
+  <table>
+    <caption style={{ display: "none" }}>Email list</caption>
+    <thead>
+      <tr>
+        <TdHead
+          id="from-sort"
+          onClick={props.handleSort}
+          text="From"
+          sorted={props.sort}
+        />
+        <TdHead
+          id="to-sort"
+          onClick={props.handleSort}
+          text="To"
+          sorted={props.sort}
+        />
+        <TdHead
+          id="subject-sort"
+          onClick={props.handleSort}
+          text="Subject"
+          sorted={props.sort}
+        />
+        <TdHead id="attachments-sort" sorted={props.sort} />
+        {/* Attachments */}
+        <TdHead
+          id="date-sort"
+          onClick={props.handleSort}
+          text="Date"
+          sorted={props.sort}
+        />
+      </tr>
+    </thead>
+    <tbody>
+      {props.emails.map((email, k) => (
+        <Row data={email} key={k} />
+      ))}
+    </tbody>
+  </table>
+);
 
 const TdHead = props => {
   const sortedType = props.sorted.get(props.id);
